@@ -17,18 +17,22 @@ function horizontal_averages(model)
     u, v, w = model.velocities
     U², V², W² = velocity_variances(model, scratch=scratch)
     # Extract Pressure (I'm not sure this is available in model)
-    # p = model.pressure
+    p = model.pressures.pHY
 
     # Define horizontal averages
     U = HorizontalAverage(u)
     V = HorizontalAverage(v)
     e = TurbulentKineticEnergy(model)
     # When pressure is available calculate it's layer mean
-    # P = HorizontalAverage(p)
+    p = model.pressures.pHY′ + model.pressures.pNHS
+    P = HorizontalAverage(p, scratch)
 
     W³ = HorizontalAverage(w^3, scratch)
     wu = HorizontalAverage(w*u, scratch)
     wv = HorizontalAverage(w*v, scratch)
+    
+    # wwu = HorizontalAverage(w * w * u, scratch)
+    
     uv = HorizontalAverage((u-U)*(v-V), scratch)
     wwu = HorizontalAverage(w*w*(u-U), scratch)
     wwv = HorizontalAverage(w*w*(v-V), scratch)
