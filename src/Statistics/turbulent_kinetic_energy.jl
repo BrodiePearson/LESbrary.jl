@@ -20,9 +20,9 @@ function TurbulentKineticEnergy(model)
     u, v, w = model.velocities
     e = CellField(model.architecture, model.grid)
 
-    U_average = HorizontalAverage(u)
-    V_average = HorizontalAverage(v)
-    e_average = HorizontalAverage(e)
+    U_average = Average(u, dims=(1, 2))
+    V_average = Average(v, dims=(1, 2))
+    e_average = Average(e, dims=(1, 2))
 
     return TurbulentKineticEnergy(e, u, v, w, U_average, V_average, e_average)
 end
