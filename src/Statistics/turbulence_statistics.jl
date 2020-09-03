@@ -282,7 +282,7 @@ function horizontal_averages(model)
     V = Average(v, dims=(1, 2))
     #e = TurbulentKineticEnergy(model)
 
-    W³ = Average(w.^3, model.velocities, dims=(1, 2))
+    W³ = Average(w*w*w, model.velocities, dims=(1, 2))
     wu = Average(w*u, dims=(1, 2))
     wv = Average(w*v, dims=(1, 2))
 
