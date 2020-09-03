@@ -282,17 +282,17 @@ function horizontal_averages(model)
     V = Average(v, dims=(1, 2))
     #e = TurbulentKineticEnergy(model)
 
-    W³ = Average(w*w*w, dims=(1, 2))
-    wu = Average(w*u, dims=(1, 2))
-    wv = Average(w*v, dims=(1, 2))
+    #W³ = Average(w^3, dims=(1, 2))
+    #wu = Average(w*u, dims=(1, 2))
+    #wv = Average(w*v, dims=(1, 2))
 
     primitive_averages = (
                            U = model -> U(model),
                            V = model -> V(model),
     #                       E = model -> e(model),
-                          W³ = model -> W³(model),
-                          wu = model -> wu(model),
-                          wv = model -> wv(model),
+    #                      W³ = model -> W³(model),
+    #                      wu = model -> wu(model),
+    #                      wv = model -> wv(model),
                          )
 
     vel_variances = velocity_variances(model; scratch=scratch)
