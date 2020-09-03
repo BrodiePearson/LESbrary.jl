@@ -12,8 +12,8 @@ function horizontally_averaged_velocities(model)
     u, v, w = model.velocities
 
     # Define horizontal averages
-    U = HorizontalAverage(u)
-    V = HorizontalAverage(v)
+    U = Average(u,  dims=(1, 2))
+    V = Average(v,  dims=(1, 2))
 
     averages = Dict(
                     :U => model -> U(model),
@@ -29,7 +29,7 @@ function horizontally_averaged_tracers(model)
 
     for tracer in keys(model.tracers)
         c = getproperty(model.tracers, tracer)
-        C = HorizontalAverage(c)
+        C = Average(c,  dims=(1, 2))
         averages[tracer] = model -> C(model)
     end
 
@@ -41,17 +41,17 @@ function velocity_covariances(model, scratch = CellField(model.architecture, mod
 
     u, v, w = model.velocities
 
-    uu = HorizontalAverage(u * u, scratch)
-    vv = HorizontalAverage(v * v, scratch)
-    ww = HorizontalAverage(w * w, scratch)
+    uu = Average(u * u, dims=(1, 2))
+    vv = Average(v * v, dims=(1, 2))
+    ww = Average(w * w, dims=(1, 2))
 
-    uv = HorizontalAverage(u * v, scratch)
-    wv = HorizontalAverage(w * v, scratch)
-    wu = HorizontalAverage(w * u, scratch)
+    uv = Average(u * v, dims=(1, 2))
+    wv = Average(w * v, dims=(1, 2))
+    wu = Average(w * u, dims=(1, 2))
 
-    ub = HorizontalAverage(u * b, scratch)
-    vb = HorizontalAverage(v * b, scratch)
-    wb = HorizontalAverage(w * b, scratch)
+    ub = Average(u * b, dims=(1, 2))
+    vb = Average(v * b, dims=(1, 2))
+    wb = Average(w * b, dims=(1, 2))
 
     covariances = Dict(
                        :uv => model -> uv(model),
@@ -78,10 +78,10 @@ function tracer_covariances(model, scratch = CellField(model.architecture, model
     for tracer in keys(model.tracers)
         c = getproperty(model.tracers, tracer)
 
-        cc = HorizontalAverage(c * c, scratch)
-        uc = HorizontalAverage(u * c, scratch)
-        vc = HorizontalAverage(v * c, scratch)
-        wc = HorizontalAverage(w * c, scratch)
+        cc = Average(c * c, dims=(1, 2))
+        uc = Average(u * c, dims=(1, 2))
+        vc = Average(v * c, dims=(1, 2))
+        wc = Average(w * c, dims=(1, 2))
 
         covariances[Symbol(tracer, tracer)] = model -> cc(model)
         covariances[Symbol(:u, tracer)] = model -> uc(model)
@@ -90,7 +90,7 @@ function tracer_covariances(model, scratch = CellField(model.architecture, model
 
         # Add covariance of tracer with buoyancy
         if tracer != :b
-            bc = HorizontalAverage(b * c, scratch)
+            bc = Average(b * c, scratch)
             covariances[Symbol(:b, tracer)] = model -> bc(model)
         end
     end
@@ -110,20 +110,20 @@ function third_order_velocity_statistics(model, scratch = CellField(model.archit
 
     u, v, w = model.velocities
 
-    uuu = HorizontalAverage(u * u * u, scratch)
-    vvv = HorizontalAverage(v * v * v, scratch)
-    www = HorizontalAverage(w * w * w, scratch)
+    uuu = Average(u * u * u, dims=(1, 2))
+    vvv = Average(v * v * v, dims=(1, 2))
+    www = Average(w * w * w, dims=(1, 2))
 
-    uuv = HorizontalAverage(u * u * v, scratch)
-    uvv = HorizontalAverage(u * v * v, scratch)
+    uuv = Average(u * u * v, dims=(1, 2))
+    uvv = Average(u * v * v, dims=(1, 2))
 
-    uuw = HorizontalAverage(u * u * w, scratch)
-    uww = HorizontalAverage(u * w * w, scratch)
+    uuw = Average(u * u * w, dims=(1, 2))
+    uww = Average(u * w * w, dims=(1, 2))
 
-    vvw = HorizontalAverage(v * v * w, scratch)
-    vww = HorizontalAverage(v * w * w, scratch)
+    vvw = Average(v * v * w, dims=(1, 2))
+    vww = Average(v * w * w, dims=(1, 2))
 
-    wvu = HorizontalAverage(w * v * u, scratch)
+    wvu = Average(w * v * u, dims=(1, 2))
 
     # Pressure-strain terms
     p = pressure(model)
@@ -132,17 +132,17 @@ function third_order_velocity_statistics(model, scratch = CellField(model.archit
     Σˣᶻ = (∂z(u) + ∂x(w)) / 2 # FCF
     Σʸᶻ = (∂z(v) + ∂y(w)) / 2 # CFF
 
-    up = HorizontalAverage(u * p, scratch)
-    vp = HorizontalAverage(v * p, scratch)
-    wp = HorizontalAverage(w * p, scratch)
+    up = Average(u * p, dims=(1, 2))
+    vp = Average(v * p, dims=(1, 2))
+    wp = Average(w * p, dims=(1, 2))
 
-    pΣˣˣ = HorizontalAverage(p * ∂x(u), scratch)
-    pΣʸʸ = HorizontalAverage(p * ∂y(v), scratch)
-    pΣᶻᶻ = HorizontalAverage(p * ∂z(w), scratch)
+    pΣˣˣ = Average(p * ∂x(u), dims=(1, 2))
+    pΣʸʸ = Average(p * ∂y(v), dims=(1, 2))
+    pΣᶻᶻ = Average(p * ∂z(w), dims=(1, 2))
 
-    pΣˣʸ = HorizontalAverage(p * Σˣʸ, scratch)
-    pΣʸᶻ = HorizontalAverage(p * Σʸᶻ, scratch)
-    pΣˣᶻ = HorizontalAverage(p * Σˣᶻ, scratch)
+    pΣˣʸ = Average(p * Σˣʸ, dims=(1, 2))
+    pΣʸᶻ = Average(p * Σʸᶻ, dims=(1, 2))
+    pΣˣᶻ = Average(p * Σˣᶻ, dims=(1, 2))
 
     third_order_statistics = Dict(
                                    :uuu => model -> uuu(model),
@@ -184,12 +184,12 @@ function third_order_tracer_statistics(model, scratch = CellField(model.architec
     for tracer in keys(model.tracers)
         c = getproperty(model.tracers, tracer)
 
-        cwu = HorizontalAverage(c * w * u, scratch)
-        wcc = HorizontalAverage(w * c * c, scratch)
+        cwu = Average(c * w * u, dims=(1, 2))
+        wcc = Average(w * c * c, dims=(1, 2))
 
-        cpx = HorizontalAverage(c * ∂x(p), scratch)
-        cpy = HorizontalAverage(c * ∂y(p), scratch)
-        cpz = HorizontalAverage(c * ∂z(p), scratch)
+        cpx = Average(c * ∂x(p), dims=(1, 2))
+        cpy = Average(c * ∂y(p), dims=(1, 2))
+        cpz = Average(c * ∂z(p), dims=(1, 2))
 
         third_order_statistics[Symbol(:w, tracer, tracer)] = model -> wcc(model)
         third_order_statistics[Symbol(tracer, :wu)] = model -> cwu(model)
@@ -228,7 +228,7 @@ function first_order_statistics(model, scratch = CellField(model.architecture, m
                    )
 
     p = pressure(model)
-    P = HorizontalAverage(p, scratch)
+    P = Average(p, dims=(1, 2))
 
     output[:P] = model -> P(model)
 
@@ -252,7 +252,7 @@ function third_order_statistics(model, scratch = CellField(model.architecture, m
                    third_order_tracer_statistics(model, scratch),
                    )
 
-    ϵ = HorizontalAverage(subfilter_viscous_dissipation(model), scratch)
+    ϵ = Average(subfilter_viscous_dissipation(model), scratch)
     output[:ϵ] = model -> ϵ(model)
 
     return output
@@ -278,13 +278,13 @@ function horizontal_averages(model)
     u, v, w = model.velocities
 
     # Define horizontal averages
-    U = HorizontalAverage(u)
-    V = HorizontalAverage(v)
-    e = TurbulentKineticEnergy(model)
+    U = Average(u, dims=(1, 2))
+    V = Average(v, dims=(1, 2))
+    e = TurbulentKineticEnergy(model, dims=(1, 2))
 
-    W³ = HorizontalAverage(w^3, scratch)
-    wu = HorizontalAverage(w*u, scratch)
-    wv = HorizontalAverage(w*v, scratch)
+    W³ = Average(w^3, dims=(1, 2))
+    wu = Average(w*u, dims=(1, 2))
+    wv = Average(w*v, dims=(1, 2))
 
     primitive_averages = (
                            U = model -> U(model),
@@ -302,15 +302,15 @@ function horizontal_averages(model)
 
     νₑ = model.diffusivities.νₑ
 
-    NU = HorizontalAverage(νₑ)
+    NU = Average(νₑ)
 
     τ₁₃ = @at (Face, Cell, Face) νₑ * (-∂z(u) - ∂x(w))
     τ₂₃ = @at (Cell, Face, Face) νₑ * (-∂z(v) - ∂y(w))
     τ₃₃ = @at (Cell, Cell, Face) νₑ * (-∂z(w) - ∂z(w))
 
-    T₁₃ = HorizontalAverage(τ₁₃, scratch)
-    T₂₃ = HorizontalAverage(τ₂₃, scratch)
-    T₃₃ = HorizontalAverage(τ₃₃, scratch)
+    T₁₃ = Average(τ₁₃, dims=(1, 2))
+    T₂₃ = Average(τ₂₃, dims=(1, 2))
+    T₃₃ = Average(τ₃₃, dims=(1, 2))
 
     average_stresses[:τ₁₃] = model -> T₁₃(model)
     average_stresses[:τ₂₃] = model -> T₂₃(model)
@@ -333,22 +333,22 @@ function horizontal_averages(model)
         c = getproperty(model.tracers, tracer)
 
         # Average tracer
-        average_tracer = HorizontalAverage(c)
+        average_tracer = Average(c, dims=(1, 2))
         average_tracers[tracer] = model -> average_tracer(model)
 
         # Advective flux
         advective_flux = w * c
-        average_advective_flux = HorizontalAverage(advective_flux, scratch)
+        average_advective_flux = Average(advective_flux, dims=(1, 2))
         average_fluxes[advective_flux_key] = model -> average_advective_flux(model)
 
         # Subfilter diffusivity (if it exists)
         try
             κₑ = getproperty(model.diffusivities.κₑ, tracer)
-            average_diffusivity = HorizontalAverage(κₑ)
+            average_diffusivity = Average(κₑ, dims=(1, 2))
             average_diffusivities[diffusivity_key] = model -> average_diffusivity(model)
 
             subfilter_flux = @at (Cell, Cell, Face) -∂z(c) * κₑ
-            average_subfilter_flux = HorizontalAverage(subfilter_flux, scratch)
+            average_subfilter_flux = Average(subfilter_flux, dims=(1, 2))
             average_fluxes[subfilter_flux_key] = model -> average_subfilter_flux(model)
         catch
         end
